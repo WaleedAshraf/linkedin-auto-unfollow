@@ -6,9 +6,14 @@ const start = () => {
     if (regex.test(window.location.href)) {
         const intervalId = setInterval(() => {
             // checking for default linkedin button
-            const defaultFollowExist = document.querySelectorAll(
-                "div.pvs-profile-actions > button"
-            ).length;
+            const defaultFollowExist = document
+                .querySelectorAll("div.pvs-profile-actions > button")
+                .forEach((element) => {
+                    return (
+                        element.innerText == "Following" ||
+                        element.innerText == "Follow"
+                    );
+                });
             // getting unique elements that containes FSD ID
             const profileIdElement =
                 document.getElementById(
@@ -33,7 +38,6 @@ const start = () => {
             const mainDiv = document.getElementsByClassName(
                 "pvs-profile-actions"
             )[0];
-
             if (counter > 30) clearInterval(intervalId);
             if (profileId && mainDiv && (counter == 30 || defaultFollowExist)) {
                 clearInterval(intervalId);
@@ -69,58 +73,51 @@ const run = (profileId) => {
     document
         .querySelectorAll(".pvs-profile-actions .display-flex.t-normal.flex-1")
         .forEach((e) => {
-            if (e.textContent == "Following") following = true;
+            if (
+                e.textContent == "Following" &&
+                connRequest?.innerText !== "Accept"
+            )
+                following = true;
         });
-
-    if (following && !document.getElementById("linkedin-unfollow")) {
-        document
-            .getElementsByClassName("pvs-profile-actions")[0]
-            .insertAdjacentHTML(
-                "beforeend",
-                '<button id="linkedin-unfollow" class="artdeco-button artdeco-button--2 artdeco-button--secondary ember-view pvs-profile-actions__action"><span class="artdeco-button__text">UF</span></button>'
+    document
+        .getElementsByClassName("pvs-profile-actions")[0]
+        .insertAdjacentHTML(
+            "beforeend",
+            '<button id="custom-linkedin-follow" class="artdeco-button artdeco-button--2 artdeco-button--secondary ember-view pvs-profile-actions__action"><span class="artdeco-button__text">UF</span></button>'
+        );
+    const customLinkedinFollowButton = document.getElementById(
+        "custom-linkedin-follow"
+    );
+    const sendRequest = async () => {
+        customLinkedinFollowButton.disabled = true;
+        try {
+            const response = await fetch(
+                `https://${window.location.host}/voyager/api/feed/dash/followingStates/urn:li:fsd_followingState:urn:li:fsd_profile:${profileId}`,
+                {
+                    headers: {
+                        "csrf-token": sessionId,
+                    },
+                    body: `{"patch":{"$set":{"following":${!following}}}}`,
+                    method: "POST",
+                }
             );
-
-        document
-            .getElementById("linkedin-unfollow")
-            .addEventListener("click", () => {
-                sendRequest(profileId, sessionId);
-                document.getElementById("linkedin-unfollow").disabled = true;
-            });
-    } else if (!following && !document.getElementById("linkedin-follow")) {
-        document
-            .getElementsByClassName("pvs-profile-actions")[0]
-            .insertAdjacentHTML(
-                "beforeend",
-                '<button id="linkedin-follow" class="artdeco-button artdeco-button--2 artdeco-button--secondary ember-view pvs-profile-actions__action"><span class="artdeco-button__text">F</span></button>'
-            );
-
-        document
-            .getElementById("linkedin-follow")
-            .addEventListener("click", () => {
-                sendRequest(profileId, sessionId, "true");
-                document.getElementById("linkedin-follow").disabled = true;
-            });
-    }
+            following = !following;
+            customLinkedinFollowButton.disabled = false;
+            customLinkedinFollowButton.innerText = following
+                ? "UnFollow"
+                : "Follow";
+        } catch (error) {
+            console.log(`follow / unfollow request error : ${error.message}`);
+        }
+    };
+    customLinkedinFollowButton.addEventListener("click", () => {
+        sendRequest();
+    });
+    customLinkedinFollowButton.innerText = following ? "UnFollow" : "Follow";
 
     if (connRequest?.innerText == "Accept") {
         connRequest.addEventListener("click", () => {
-            sendRequest(profileId, sessionId);
+            sendRequest();
         });
-    }
-};
-const sendRequest = async (profileId, sessionId, follow = "false") => {
-    try {
-        const response = await fetch(
-            `https://${window.location.host}/voyager/api/feed/dash/followingStates/urn:li:fsd_followingState:urn:li:fsd_profile:${profileId}`,
-            {
-                headers: {
-                    "csrf-token": sessionId,
-                },
-                body: `{"patch":{"$set":{"following":${follow}}}}`,
-                method: "POST",
-            }
-        );
-    } catch (error) {
-        console.log(`follow / unfollow request error : ${error.message}`);
     }
 };
