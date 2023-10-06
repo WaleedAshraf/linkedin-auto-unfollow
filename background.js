@@ -1,5 +1,7 @@
+const profilePageRegex = /https:\/\/\w{1,3}.linkedin.com\/in/
+
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  if (changeInfo.url) {
+  if (profilePageRegex.test(changeInfo.url) && changeInfo.status === 'complete') {
     chrome.tabs.sendMessage(tabId, {
       message: "clicked",
       url: changeInfo.url,
