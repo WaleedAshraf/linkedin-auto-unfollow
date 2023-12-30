@@ -1,6 +1,6 @@
 {
   "name": "LinkedIn Auto Un-Follow",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Auto Un-Follow new connections on LinkedIn",
   "manifest_version": 3,
   "optional_host_permissions": ["https://*.linkedin.com/*"],

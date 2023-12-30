@@ -6,6 +6,7 @@ const ACCEPT = 'Accept'
 let intervalId = null
 let counter = 0
 let acceptButton = null
+let profileActionsDivName = 'pvs-profile-actions'
 
 // get user profileId
 const getProfileId = () => {
@@ -28,9 +29,12 @@ const getProfileId = () => {
 // checking for default linkedin follow button
 const getFollowStatus = () => {
   let followStatus = null
-  document
-    .querySelectorAll("div.pvs-profile-actions span")
-    .forEach((e) => {
+  let buttons = document.querySelectorAll(`div.${profileActionsDivName} span`)
+  if (buttons.length === 0) {
+    buttons = document.querySelectorAll("div.pv-top-card-v2-ctas span")
+    if (buttons.length) profileActionsDivName = 'pv-top-card-v2-ctas'
+  }
+  buttons.forEach((e) => {
       if (e.innerHTML.trim() === FOLLOWING) followStatus = FOLLOWING
       if (e.innerHTML.trim() === FOLLOW) followStatus = FOLLOW
       if (e.innerHTML.trim() === ACCEPT) acceptButton = e
@@ -39,9 +43,9 @@ const getFollowStatus = () => {
 }
 
 // get profile actions div
-const getProfileActionsDiv = () => document.getElementsByClassName(
-  "pvs-profile-actions"
-)[0]
+const getProfileActionsDiv = () => {
+  return document.getElementsByClassName(profileActionsDivName)[0]
+}
 
 // stop the interval and reset counter to zero
 const stopInterval = (intervalId) => {
@@ -111,7 +115,7 @@ const updateDocument = (profileId, defaultFollow) => {
 
   if (!document.getElementById("follow-button"))
     document
-      .getElementsByClassName("pvs-profile-actions")[0]
+      .getElementsByClassName(profileActionsDivName)[0]
       .insertAdjacentHTML(
         "beforeend",
         `<button id="follow-button" class="artdeco-button artdeco-button--2 artdeco-button--secondary ember-view pvs-profile-actions__action"><span class="artdeco-button__text">${followButtonText}</span></button>`
