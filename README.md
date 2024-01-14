@@ -1,4 +1,4 @@
-# LinkedIn Auto Un-Follow
+# Linked-In Auto Un-Follow
 
 Automatically unfollow when you accept a connection request.
 
@@ -15,5 +15,5 @@ Automatically unfollow when you accept a connection request.
 - No data is scraped, collected, stored, or logged
 
 ## Required Access:
-- Extension only runs on "linkedin.com" pages.
+- Extension only runs on Linked-In site.
 - Tab access is required to check if pages are dynamically updated/rendered.

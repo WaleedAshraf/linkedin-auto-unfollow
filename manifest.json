@@ -1,7 +1,7 @@
 {
-  "name": "LinkedIn Auto Un-Follow",
-  "version": "1.0.1",
-  "description": "Auto Un-Follow new connections on LinkedIn",
+  "name": "Linked-In Auto Un-Follow",
+  "version": "1.0.2",
+  "description": "Auto Un-Follow new connections on Linked-In",
   "manifest_version": 3,
   "optional_host_permissions": ["https://*.linkedin.com/*"],
   "background": {
