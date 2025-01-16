@@ -6,7 +6,12 @@ const ACCEPT = 'Accept'
 let intervalId = null
 let counter = 0
 let acceptButton = null
-let profileActionsDivName = 'pvs-profile-actions'
+const profileActionsDivList = [
+  'pvs-profile-actions__custom',
+  'pvs-profile-actions',
+  'pv-top-card-v2-ctas'
+]
+let profileActionsDivName = null
 
 // get user profileId
 const getProfileId = () => {
@@ -29,17 +34,17 @@ const getProfileId = () => {
 // checking for default linkedin follow button
 const getFollowStatus = () => {
   let followStatus = null
-  let buttons = document.querySelectorAll(`div.${profileActionsDivName} span`)
-  if (buttons.length === 0) {
-    buttons = document.querySelectorAll("div.pv-top-card-v2-ctas span")
-    if (buttons.length) profileActionsDivName = 'pv-top-card-v2-ctas'
-  }
-  buttons.forEach((e) => {
+  for (let divName of profileActionsDivList) {
+    let buttons = document.querySelectorAll(`div.${divName} span`)
+    if (!buttons.length) continue
+    profileActionsDivName = divName
+    buttons.forEach((e) => {
       if (e.innerHTML.trim() === FOLLOWING) followStatus = FOLLOWING
       if (e.innerHTML.trim() === FOLLOW) followStatus = FOLLOW
       if (e.innerHTML.trim() === ACCEPT) acceptButton = e
     })
-  return followStatus
+    return followStatus
+  }
 }
 
 // get profile actions div
