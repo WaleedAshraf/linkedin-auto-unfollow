@@ -6,12 +6,7 @@ const ACCEPT = 'Accept'
 let intervalId = null
 let counter = 0
 let acceptButton = null
-const profileActionsDivList = [
-  'pvs-profile-actions__custom',
-  'pvs-profile-actions',
-  'pv-top-card-v2-ctas'
-]
-let profileActionsDivName = null
+let profileActionsDiv = null
 
 // get user profileId
 const getProfileId = () => {
@@ -34,22 +29,25 @@ const getProfileId = () => {
 // checking for default linkedin follow button
 const getFollowStatus = () => {
   let followStatus = null
-  for (let divName of profileActionsDivList) {
-    let buttons = document.querySelectorAll(`div.${divName} span`)
-    if (!buttons.length) continue
-    profileActionsDivName = divName
-    buttons.forEach((e) => {
-      if (e.innerHTML.trim() === FOLLOWING) followStatus = FOLLOWING
-      if (e.innerHTML.trim() === FOLLOW) followStatus = FOLLOW
-      if (e.innerHTML.trim() === ACCEPT) acceptButton = e
-    })
-    return followStatus
-  }
+  const acceptSpan = document.querySelector('button.artdeco-button--primary span.artdeco-button__text:not(.pvs-sticky-header-profile-actions *)');
+  const followSpan = document.querySelector('div[aria-label^="Follow"] span.t-normal:not(.pvs-sticky-header-profile-actions *)');
+  const unfollowSpan = document.querySelector('div[aria-label^="Unfollow"] span.t-normal:not(.pvs-sticky-header-profile-actions *)');
+  const divsAfterLinksWithOnlyClass = Array.from(document.querySelectorAll('.ph5 a + div')).filter(div => {
+    return div.attributes.length === 1 && div.hasAttribute('class');
+  });
+
+  if (followSpan) followStatus = FOLLOW
+  if (unfollowSpan) followStatus = FOLLOWING
+  acceptButton = acceptSpan ? acceptSpan : null
+  profileActionsDiv = divsAfterLinksWithOnlyClass[0] ?? null
+  return followStatus;
 }
 
 // get profile actions div
 const getProfileActionsDiv = () => {
-  return document.getElementsByClassName(profileActionsDivName)[0]
+  return Array.from(document.querySelectorAll('.ph5 a + div')).filter(div => {
+    return div.attributes.length === 1 && div.hasAttribute('class');
+  })[0];
 }
 
 // stop the interval and reset counter to zero
@@ -119,8 +117,7 @@ const updateDocument = (profileId, defaultFollow) => {
   const sessionId = document.cookie.match(/JSESSIONID="([^"]*)/)[1]
 
   if (!document.getElementById("follow-button"))
-    document
-      .getElementsByClassName(profileActionsDivName)[0]
+    profileActionsDiv
       .insertAdjacentHTML(
         "beforeend",
         `<button id="follow-button" class="artdeco-button artdeco-button--2 artdeco-button--secondary ember-view pvs-profile-actions__action"><span class="artdeco-button__text">${followButtonText}</span></button>`
